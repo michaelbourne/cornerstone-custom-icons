@@ -1,1 +1,0 @@
-# cornerstone-custom-icons
