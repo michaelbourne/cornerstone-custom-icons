@@ -2,9 +2,9 @@
 /*
 Plugin Name: Cornerstone Custom Icons
 Description: Add custom icon fonts and SVGs to the built in Cornerstone and Pro elements controls
-Version:     0.1.4
+Version:     0.1.5
 Author:      Michael Bourne
-Author URI:  https://ursa6.com
+Author URI:  https://michaelbourne.ca
 License:     GPL3
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 Text Domain: cc-icons
@@ -66,27 +66,27 @@ if ( ! class_exists( 'CCIcons' ) ) {
 			include_once( CCICONS_ROOT . '/includes/save.font.php' );
 
 			// add menu item
-			add_action( 'admin_menu', array( &$this, 'add_admin_menu' ) );
+			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 
-			add_action( 'admin_init', array( &$this, 'admin_init' ) );
+			add_action( 'admin_init', array( $this, 'admin_init' ) );
 
 			// add admin styles and scripts
-			add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
-			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 			// for front end
-			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ), 999999 );
-			add_action( 'wp_enqueue_scripts_clean', array( &$this, 'enqueue_scripts' ), 10 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 999999 );
+			add_action( 'wp_enqueue_scripts_clean', array( $this, 'enqueue_scripts' ), 10 );
 			
 			// doesnt work for now
-			//add_action( 'cornerstone_before_boot_app', array( &$this, 'enqueue_scripts' ), 100 );
+			//add_action( 'cornerstone_before_boot_app', array( $this, 'enqueue_scripts' ), 100 );
 
 			// add icon css to footer for builder support
-			add_action( 'wp_print_footer_scripts', array( &$this, 'insert_footer_css' ) );
+			add_action( 'wp_print_footer_scripts', array( $this, 'insert_footer_css' ) );
 
 			// load icons
-			add_action( 'cornerstone_config_common_font-icons', array( &$this, 'icons_filters' ), 999 );
-
+			//add_action( 'cornerstone_config_common_font-icons', array( $this, 'icons_filters' ), 999 );
+			add_filter( 'cornerstone_config_common_font-icons', array( $this, 'icons_filters' ), 20 );
 			$upload = wp_upload_dir();
 
 			// main variables
@@ -98,7 +98,7 @@ if ( ! class_exists( 'CCIcons' ) ) {
 			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
 
 			// load translations
-			add_action( 'plugins_loaded', array( &$this, 'cc_load_textdomain' ) );
+			add_action( 'plugins_loaded', array( $this, 'cci_load_textdomain' ) );
 		}
 
 		/**
@@ -150,7 +150,7 @@ if ( ! class_exists( 'CCIcons' ) ) {
 		public function add_admin_menu() {
 
 			add_menu_page( __( 'Cornerstone Custom Icons', 'cc-icons' ), __( 'Cornerstone Custom Icons', 'cc-icons' ), 'manage_options', 'cornerstone_icons_settings', array(
-				&$this,
+				$this,
 				'options_page',
 			), plugins_url( 'assets/font.png', __FILE__ ) );
 
@@ -182,11 +182,11 @@ if ( ! class_exists( 'CCIcons' ) ) {
 		 */
 		public function admin_enqueue_scripts() {
 
-			wp_enqueue_style( 'admin_fontellos_css', CCICONS_URI . 'assets/css/cornerstone-custom-icons.css', array(), '0.1.1' );
+			wp_enqueue_style( 'admin_fontellos_css', CCICONS_URI . 'assets/css/cornerstone-custom-icons.css', array(), '0.1.4' );
 
 			wp_enqueue_script( 'cornerstone-custom-icons', CCICONS_URI . 'assets/js/cornerstone-custom-icons.js', array(
 				'jquery',
-			), '0.1.0', true );
+			), '0.1.4', true );
 
 			if ( is_admin() ) {
 				$fontellos = array(
@@ -288,6 +288,7 @@ if ( ! class_exists( 'CCIcons' ) ) {
 			$options = get_option( 'cc_icons_fonts' );
 
 			$icons = array();
+			$icons_reverse = array();
 			if ( empty( $options ) ) {
 				return $config;
 			}
@@ -300,17 +301,29 @@ if ( ! class_exists( 'CCIcons' ) ) {
 					if ( !empty($new_icons) && is_array( $new_icons ) ) {
 						$icons = array_merge( $new_icons, $icons );
 					}
+
+					$new_icons_reverse = $this->parse_css_reverse( $font_data['css_root'], $font_data['name'] );
+					if ( !empty($new_icons_reverse) && is_array( $new_icons_reverse ) ) {
+						$icons_reverse = array_merge($new_icons_reverse, $icons_reverse);
+					}
 				}
 			}
 
-			$config = array_merge( $icons, $config );
+			if( array_key_exists('icons', $config) && is_array($config['icons'])){
+				//array_push( $config['icons'], $icons );
+				$config['icons'] = $icons + $config['icons'];
+				//array_push( $config['reverse_aliases'], $icons_reverse );
+				$config['reverse_aliases'] = $icons_reverse + $config['reverse_aliases'];
+			} else {
+				array_push( $config, $icons );
+			}
 
 			return $config;
 		}
 
 
 		/**
-		 * Parse CSS that to get icons.
+		 * Parse CSS to get icons.
 		 *
 		 * @param $css_file
 		 *
@@ -333,6 +346,30 @@ if ( ! class_exists( 'CCIcons' ) ) {
 
 		}
 
+
+		/**
+		 * Parse CSS to get icon reverse alias.
+		 *
+		 * @param $css_file
+		 *
+		 * @return array
+		 */
+		protected function parse_css_reverse( $css_file, $name ) {
+
+			$icons = array();
+			if ( ! file_exists( $css_file ) ) {
+				return null;
+			}
+			$css_source = file_get_contents( $css_file );
+
+			preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
+			foreach ( $matches as $match ) {
+				$icons[ $match[2] ] = $name . '-' . $match[1];
+			}
+
+			return $icons;
+
+		}
 
 		/**
 		 * remove folder (recursive)

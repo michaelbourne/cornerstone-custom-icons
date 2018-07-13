@@ -49,7 +49,7 @@ class MergeCss_CCIcons extends CCIcons {
 						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".woff2?" . $randomver . "') format('woff2'),
 						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".woff?" . $randomver . "') format('woff'),
 						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".ttf?" . $randomver . "') format('truetype'),
-						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".svg?" . $randomver . "#samplefont') format('svg');
+						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".svg?" . $randomver . "#" . $font_data['name'] . "') format('svg');
 						  font-weight: normal;
 						  font-style: normal;
 						}\n";
@@ -61,8 +61,11 @@ class MergeCss_CCIcons extends CCIcons {
 				if (!empty($icons) && is_array($icons)){
 
 					foreach ( $icons as $name_icon => $code ) {
-						$css_content .= ".x-icon-" . $name_icon . ":before { content: '\\" . $code . "'; }\n";
-						$css_content .= ".cs-fa-" . $name_icon . ":before { content: '\\" . $code . "'; }\n";
+						$css_content .= ".x-icon-" . $name_icon . ":before { content: '\\" . $code . "'; font-weight: normal; }\n";
+						$css_content .= ".cs-fa-" . $name_icon . ":before { content: '\\" . $code . "'; font-weight: normal; }\n";
+						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "'] { font-family: 'FontAwesome'; font-weight: normal; }\n";
+						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "'] svg { display: none; }\n";
+						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "']::before{ content: '\\" . $code . "'; }\n";
 					}
 				}
 

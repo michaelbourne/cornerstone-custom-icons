@@ -3,8 +3,8 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: cornerstone, x theme, themeco, x pro, pro theme, icons, images, fontello, icon fonts
 Requires at least: 4.5
-Tested up to: 4.9.4
-Stable tag: 0.1.4
+Tested up to: 4.9.7
+Stable tag: 0.1.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -54,9 +54,13 @@ None yet
 
 == Changelog ==
 
+= 0.1.5 =
+* Added fix for Pro version 2.2.0+ (FontAwesome 5 update)
+* Added "regenerate CSS" option to fix domain errors
+
 = 0.1.4 =
 * Added full l18n support for translations
-* Added French translation by _________________
+* Fixed PHP 7.2 Notices
 
 = 0.1.3 =
 * Add SSL check for rare occurance of insecure content warning
@@ -71,8 +75,8 @@ None yet
 
 == Upgrade Notice ==
 
-= 0.1.4 =
-Added l18n support and French translation 
+= 0.1.5 =
+Added l18n support and FA5 fix
 
 = 0.1.2 =
 ReadMe update only

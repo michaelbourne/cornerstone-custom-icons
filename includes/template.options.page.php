@@ -148,6 +148,7 @@ $options = get_option( 'cc_icons_fonts' );
 			} ?>
 
 			<div class="cci-row">
+				<div class="cci-column">
 				<div class="cci-box-content cci-pan cci-ta-center wrapper-list-fonts <?php echo esc_attr($class_wrap); ?>">
 					<p class="cci-extensions-info"><b><?php esc_html_e( 'Uploaded Fonts', 'cc-icons' ); ?></b></p>
 					<div class="cci-extensions">
@@ -215,6 +216,26 @@ $options = get_option( 'cc_icons_fonts' );
 							</div>
 						<?php endforeach; ?>
 					<?php endif; ?>
+				</div>
+			</div>
+		</div>
+		</div>
+		<div class="cci-row">
+			<div class="cci-column">
+				<div class="cci-box cci-box-min-height">
+
+						<header class="cci-box-header">
+							<h2 class="cci-box-title"><?php esc_html_e( 'Regenerate CSS', 'cc-icons' ); ?></h2>
+						</header>
+
+						<div class="cci-box-content">
+							<p><?php esc_html_e( 'Sometimes you may need to regenerate the CSS file for your custom icons, such as wehn you change your WordPress domain or update this plugin.', 'cc-icons' ); ?></p>
+										<div class="cc-icons-regen">
+											<?php esc_html_e( 'Regenerate', 'cc-icons' ); ?>
+										</div>
+
+						</div>
+
 				</div>
 			</div>
 		</div>

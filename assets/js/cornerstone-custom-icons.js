@@ -71,6 +71,7 @@ jQuery( function() {
 				success: function( response, textStatus ) {
 					callback( response, this );
 				}
+
 			} );
 		}
 
@@ -121,6 +122,10 @@ jQuery( function() {
 
 						if ( response.status_save === 'exist' ) {
 							alert( 'File already exists' );
+						}
+
+						if ( response.status_save === 'failed' ) {
+							alert( 'Invalid file format' );
 						}
 
 					} );
@@ -174,7 +179,27 @@ jQuery( function() {
 
 		} );
 
-		/* Change Status */
+		/* Regen */
+		$( '.cc-icons-regen' ).on( 'click', function( e ) {
+
+			e.preventDefault();
+
+			var request = new FormData();
+			request.append( "action", "cc_icons_regenerate" );
+
+			ajaxSend( request, function(response) {
+
+				if ( response.status_regen === 'regen' ) {
+					alert("Done!");
+				} else {
+					alert("Unknown error...");
+				}
+
+			} );
+
+		} );
+
+		/* FUTURE: status change*/
 		$( '.wrapper-list-fonts' ).on( 'click', '.cci-extension-status-icon', function( e ) {
 
 			e.preventDefault();

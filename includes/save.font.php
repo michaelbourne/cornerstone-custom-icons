@@ -17,7 +17,7 @@ class SaveFont_CCIcons extends CCIcons {
 		$action = cc_icons_manager()->getRequest( 'action', 'cc_icons_save_font' );
 
 		// ajax events
-		add_action( 'wp_ajax_' . $action, array( &$this, $action ) );
+		add_action( 'wp_ajax_' . $action, array( $this, $action ) );
 
 	}
 
@@ -41,6 +41,10 @@ class SaveFont_CCIcons extends CCIcons {
 				if ( $res === true ) {
 					$zip->extractTo( $this->upload_dir . '/' . $file_name );
 					$zip->close();
+				} else {
+					$result['status_save'] = 'failed';
+					echo json_encode( $result );
+					die();
 				}
 
 				$font_data = $this->get_config_font( $file_name );
@@ -140,6 +144,20 @@ class SaveFont_CCIcons extends CCIcons {
 			echo json_encode( $result );
 
 		//}
+
+		die();
+	}
+
+	/**
+	 * Regenerate CSS file
+	 */
+	public function cc_icons_regenerate() {
+
+		new MergeCss_CCIcons();
+
+		$result = array();
+		$result['status_regen'] = 'regen';
+		echo json_encode( $result );
 
 		die();
 	}
