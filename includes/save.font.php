@@ -9,6 +9,10 @@
 * @since     0.0.1
 */
 
+if( ! defined( 'ABSPATH' ) ) {
+    return;
+}
+
 class SaveFont_CCIcons extends CCIcons {
 
 
@@ -39,15 +43,21 @@ class SaveFont_CCIcons extends CCIcons {
 				$zip = new ZipArchive;
 				$res = $zip->open( $_FILES['source_file']['tmp_name'] );
 				if ( $res === true ) {
-					$zip->extractTo( $this->upload_dir . '/' . $file_name );
+					$ex = $zip->extractTo( $this->upload_dir . '/' . $file_name );
 					$zip->close();
+					if ( $ex === false ) {
+						$result['status_save'] = 'failedextract';
+						echo json_encode( $result );
+						die();
+					}
 				} else {
-					$result['status_save'] = 'failed';
+					$result['status_save'] = 'failedopen';
 					echo json_encode( $result );
 					die();
 				}
 
 				$font_data = $this->get_config_font( $file_name );
+
 				$icons     = $this->parse_css( $font_data['css_root'], $font_data['name'] );
 
 				if ( ! empty( $icons ) && is_array( $icons ) ) {
@@ -61,15 +71,14 @@ class SaveFont_CCIcons extends CCIcons {
 					$result['iconlist'] = $iconlist;
 				}
 
-				if ( ! empty( $font_data['name'] ) ) {
-					$result['name'] = $font_data['name'];
-				}
-
-				$result['status_save'] = $this->update_options( $font_data, '1' /* enabled */ );
+				$result['name'] = $font_data['name'];
+				$result['status_save'] = $this->update_options( $font_data, '1' );
 				$result['data'] = $font_data;
 
 				new MergeCss_CCIcons();
 
+			} else {
+				$result['status_save'] = 'emptyfile';
 			}
 
 			echo json_encode( $result );
@@ -79,6 +88,13 @@ class SaveFont_CCIcons extends CCIcons {
 
 	}
 
+	/**
+	 * Update Options table
+	 *
+	 * @param array $font_data
+	 * @param string $status
+	 * @return null|string
+	 */
 	private function update_options( $font_data, $status ) {
 
 		if ( empty( $font_data['name'] ) ) {
@@ -102,7 +118,7 @@ class SaveFont_CCIcons extends CCIcons {
 		if ( update_option( 'cc_icons_fonts', $options ) ) {
 			return 'updated';
 		} else {
-			return 'none';
+			return 'updatefailed';
 		}
 
 	}
@@ -112,7 +128,7 @@ class SaveFont_CCIcons extends CCIcons {
 	 */
 	public function cc_icons_delete_font() {
 
-		//if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'cc_icons_nonce' ) ) {
+		if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'cc_icons_nonce' ) ) {
 
 			$file_name = $this->getRequest( 'file_name', 'font' );
 
@@ -143,7 +159,15 @@ class SaveFont_CCIcons extends CCIcons {
 
 			echo json_encode( $result );
 
-		//}
+		} else {
+
+			$result = array(
+				'status_save' => 'deletefailed',
+			);
+
+			echo json_encode( $result );
+
+		}
 
 		die();
 	}
@@ -151,7 +175,33 @@ class SaveFont_CCIcons extends CCIcons {
 	/**
 	 * Regenerate CSS file
 	 */
-	public function cc_icons_regenerate() {
+	public static function cc_icons_regenerate() {
+
+		$options = get_option( 'cc_icons_fonts' );
+
+		if ( !empty( $options ) && is_array($options) ) {
+
+			$newoptions = array();
+			
+			foreach ( $options as $key => $font ) {
+
+				if ( empty( $font['data'] ) ) {
+					continue;
+				}
+
+				$font_decode = json_decode($font['data'],true);
+
+				$font_data = $this->get_config_font( $font_decode['file_name'] );
+
+				$newoptions[ $font_data['name'] ] = array(
+					'status' => '1',
+					'data'   => json_encode( $font_data ),
+				);
+
+			}
+			update_option( 'cc_icons_fonts', $newoptions );
+
+		}
 
 		new MergeCss_CCIcons();
 

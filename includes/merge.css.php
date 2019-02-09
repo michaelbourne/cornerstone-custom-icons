@@ -9,6 +9,9 @@
 * @since     0.0.1
 */
 
+if( ! defined( 'ABSPATH' ) ) {
+    return;
+}
 
 class MergeCss_CCIcons extends CCIcons {
 
@@ -39,18 +42,30 @@ class MergeCss_CCIcons extends CCIcons {
 
 				$font_data = json_decode($font['data'],true);
 
-				// the query var on the font files should be randomly generated each time the css file is altered for cache purposes
-				// ALL fontello fonts need to be called under FontAwesome in order to work on X and Pro themes. Hacky? Yes.
+				if ( isset($font_data['nameempty']) && $font_data['nameempty'] == true ){
+					$fontfilename = 'fontello';
+				} else {
+					$fontfilename = strtolower( $font_data['name'] );
+				}
+
+				$style_parent_theme = wp_get_theme(get_template());
+				$style_parent_theme_ver = $style_parent_theme->get( 'Version' );
+				if (version_compare($style_parent_theme_ver, '2.2.0') >= 0) {
+    				$weight = '900';
+				} else {
+					$weight = 'normal';
+				}
+
 				$randomver = mt_rand();
 				$css_content .= "@font-face {
 						 font-family: 'FontAwesome';
-						  src: url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".eot?" . $randomver . "');
-						  src: url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".eot?" . $randomver . "#iefix') format('embedded-opentype'),
-						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".woff2?" . $randomver . "') format('woff2'),
-						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".woff?" . $randomver . "') format('woff'),
-						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".ttf?" . $randomver . "') format('truetype'),
-						       url('" . $font_data['font_url'] . "/" . strtolower( $font_data['name'] ) . ".svg?" . $randomver . "#" . $font_data['name'] . "') format('svg');
-						  font-weight: normal;
+						  src: url('" . $font_data['font_url'] . "/" . $fontfilename  . ".eot?" . $randomver . "');
+						  src: url('" . $font_data['font_url'] . "/" . $fontfilename  . ".eot?" . $randomver . "#iefix') format('embedded-opentype'),
+						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".woff2?" . $randomver . "') format('woff2'),
+						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".woff?" . $randomver . "') format('woff'),
+						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".ttf?" . $randomver . "') format('truetype'),
+						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".svg?" . $randomver . "#" . $fontfilename  . "') format('svg');
+						  font-weight: " . $weight . ";
 						  font-style: normal;
 						}\n";
 
@@ -61,11 +76,12 @@ class MergeCss_CCIcons extends CCIcons {
 				if (!empty($icons) && is_array($icons)){
 
 					foreach ( $icons as $name_icon => $code ) {
-						$css_content .= ".x-icon-" . $name_icon . ":before { content: '\\" . $code . "'; font-weight: normal; }\n";
-						$css_content .= ".cs-fa-" . $name_icon . ":before { content: '\\" . $code . "'; font-weight: normal; }\n";
-						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "'] { font-family: 'FontAwesome'; font-weight: normal; }\n";
-						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "'] svg { display: none; }\n";
+						$css_content .= ".x-icon-" . $name_icon . ":before { content: '\\" . $code . "'; }\n";
+						$css_content .= ".cs-fa-" . $name_icon . ":before { content: '\\" . $code . "'; }\n";
+						$css_content .= "[data-cs-icon-id='" . $name_icon . "'] { font-family: 'FontAwesome'; }\n";
+						$css_content .= "[data-cs-icon-id='" . $name_icon . "'] svg { display: none; }\n";
 						$css_content .= ".cs-icons-inner li[title='" . $name_icon . "']::before{ content: '\\" . $code . "'; }\n";
+						$css_content .= "div[data-cs-icon-id='" . $name_icon . "']::before{ content: '\\" . $code . "'; margin: calc((32px / 2) - .5em); font-size: 18px;}\n";
 					}
 				}
 

@@ -532,7 +532,7 @@ p.cci-cta-note a:hover,p.cci-cta-note a:focus,p.cci-cta-note a:active {
 }
 
 @media screen and (min-width: 480px) {
-	.cci-box-min-height .cci-box-content {
+	.cci-box-min-height .cci-box-content.uploader {
 		min-height: 24em;
 	}
 }

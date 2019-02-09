@@ -1,5 +1,4 @@
-jQuery( function() {
-		var $ = jQuery;
+jQuery(document).ready(function($) {
 
 		/* For Upload */
 		var drop = $( "#cc-icons-files" );
@@ -24,35 +23,11 @@ jQuery( function() {
 		var timeout;
 
 		function progress_bar( max, time ) {
-
-			var value = 0;
-
-			function loading( time ) {
-				value += 1;
-				$( '.cc-icons-progress .bar' ).css( 'width', value + '%' );
-
-				if ( value < max ) {
-					run( time )
-				}
-
-				if ( value === 100 ) {
-					$( '.cc-icons-tit,.cc-icons-desc,.cc-icons-browse' ).show();
-					$( '.cc-icons-progress' ).removeClass( 'show' );
-				}
-			}
-
-			function run( time ) {
-				setTimeout( function() {
-					loading();
-				}, time );
-			}
-
-			run( time );
-
+			$( '.cc-icons-progress .bar' ).stop().animate({"width": max + '%'}, time );
 		}
 
 		function reloadCss() {
-			$( '#icon-fonts-css' ).each( function() {
+			$( '#cci-icon-fonts-css' ).each( function() {
 				this.href = this.href.replace( /\?.*|$/, '?ver=' + Math.random( 0, 1000 ) );
 			} );
 		}
@@ -82,17 +57,16 @@ jQuery( function() {
 				files = evt.target.files,
 				files_one = files[ 0 ];
 
+			progress_bar( 100, 200 );
+
 			// Closure to capture the file information.
 			reader.onload = (function( theFile ) {
 				return function( e ) {
-
-					progress_bar( 100, 800 );
 
 					var file_name = escape( theFile.name );
 
 					$( '.cc-icons-tit,.cc-icons-desc,.cc-icons-browse' ).hide();
 					$( '.cc-icons-progress' ).addClass( 'show' );
-					$( '#cc-icons-progress' ).after( file_name );
 
 					var request = new FormData();
 
@@ -115,18 +89,29 @@ jQuery( function() {
 								.removeClass( 'hidden' )
 								.find( '.cci-extensions' ).append( $el[ 0 ] );
 
-							$el.show().find( '.delete-font' ).attr( 'data-font', JSON.stringify( response.data ) );
+							$el.show().find( '.cci-delete-font' ).attr( 'data-font', JSON.stringify( response.data ) );
 
 							reloadCss();
 						}
-
-						if ( response.status_save === 'exist' ) {
-							alert( 'File already exists' );
+						else if ( response.status_save === 'exist' ) {
+							alert( CC_ICONS.exist );
+						} 
+						else if ( response.status_save === 'failedopen' ) {
+							alert( CC_ICONS.failedopen );
+						} 
+						else if ( response.status_save === 'failedextract' ) {
+							alert( CC_ICONS.failedextract );
+						} 
+						else if ( response.status_save === 'emptyfile' ) {
+							alert( CC_ICONS.emptyfile );
+						}
+						else if ( response.status_save === 'updatefailed' ) {
+							alert( CC_ICONS.updatefailed );
 						}
 
-						if ( response.status_save === 'failed' ) {
-							alert( 'Invalid file format' );
-						}
+						progress_bar( 0, 5 );
+						$( '.cc-icons-progress' ).removeClass( 'show' );
+						$( '.cc-icons-tit,.cc-icons-desc,.cc-icons-browse' ).show();
 
 					} );
 
@@ -137,12 +122,12 @@ jQuery( function() {
 		} );
 
 		/* Delete Font */
-		$( '.wrapper-list-fonts' ).on( 'click', '.delete-font', function( e ) {
+		$( document).on( 'click', '.cci-delete-font', function( e ) {
 			e.preventDefault();
 
-			if ( !confirm( "Are you sure you want to delete this font?" ) ) {
-				return false;
-			}
+			var conf = confirm( CC_ICONS.delete );
+			
+			if(conf == true){
 
 			var request = new FormData(),
 				$this = $( this ),
@@ -177,6 +162,8 @@ jQuery( function() {
 
 			}, this );
 
+			}
+
 		} );
 
 		/* Regen */
@@ -190,7 +177,7 @@ jQuery( function() {
 			ajaxSend( request, function(response) {
 
 				if ( response.status_regen === 'regen' ) {
-					alert("Done!");
+					alert(CC_ICONS.regen);
 				} else {
 					alert("Unknown error...");
 				}
@@ -206,7 +193,7 @@ jQuery( function() {
 
 			var request = new FormData(),
 				$this = $( this ),
-				data = $this.closest( '.font-item' ).find( '.delete-font' ).data( 'font' );
+				data = $this.closest( '.font-item' ).find( '.cci-delete-font' ).data( 'font' );
 
 			request.append( "file_name", data.name );
 			request.append( "action", "cc_icons_change_status" );

@@ -3,12 +3,12 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: cornerstone, x theme, themeco, x pro, pro theme, icons, images, fontello, icon fonts
 Requires at least: 4.5
-Tested up to: 4.9.7
-Stable tag: 0.1.5
+Tested up to: 5.0.2
+Stable tag: 0.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
-Add custom icon fonts and SVGs to the built in Cornerstone and Pro elements controls
+Add custom icon fonts from Fontello to the built in Cornerstone and Pro elements controls
 
 == Description ==
 
@@ -16,7 +16,7 @@ Enables the user to add their own custom icons to the built in Cornerstone and P
 
 = Plugin Features =
  
-*   Add unlimited icons and SVG icons to your website
+*   Add unlimited icons and SVG icons to your website through Fontello's free service
 *   Upload multiple icon packs from Fontello
 *   View the icons in each uploaded pack, delete individually if desired
 *   Use icons anywhere you would normally with the default Cornerstone icon selector
@@ -42,7 +42,12 @@ You can add your own icons to the Cornerstone and Pro builders. From exisiting f
 
 = Can I upload more than one Fontello package to a single site? =
 
-You bet! Upload as many as you like, they will all work. However, there are a couple tips to make it work better: 1) make sure you give each font a unique name (text box beside the Fontello download button). 2) Edit the unicode values on each font to be different. This step is a little time consuming, but by default, Fontello starts all new fonts with E800, which will cause a conflict when you upload more than one package.
+You bet! Upload as many as you like, they will all work. However, there are a couple tips to make it work better: 1) make sure you give each font a unique name (text box beside the Fontello download button). 2) Edit the unicode values on each font to be different. This step is a little time consuming, but by default, Fontello starts most new fonts with E800, which will cause a conflict when you upload more than one package.
+
+= HELP! It doesnt work?! =
+
+There is a small, small chance this plugin may not work on your web host. This is caused by two things generally: a mod_security rule flagging the ZIP upload, or the lack of PHP libraries needed to unzip files. Here's the good news: your host can fix both of these easily. If they refuse, consider moving to a more modern host.
+
 
 == Plugin Removal ==
 
@@ -53,6 +58,30 @@ Removing this plugin will render your custom icons to be broken. Take care to re
 None yet
 
 == Changelog ==
+
+= 0.2.1 =
+* Fix: regen CSS now regenerates options table as well for file paths
+* Tweak: CSS files use relatie URLs instead of absolute
+* Added: uninstall.php file to clean up font files after plugin removal
+
+= 0.1.9 =
+* Fix: compatiblity with Pro 2.3.2+
+
+= 0.1.8 =
+* Fix: delete font button not working
+
+= 0.1.7 =
+* Limit upload area to zip files only to prevent confusion
+* Added javascript translations
+* Fixed icon font rendering after upload
+* Added additional error alerts on font upload for hosts with no zip support
+* Fix jQuery reloading of stylsheet in admin page 
+* Fix error where an un-named font will not render properly
+
+= 0.1.6 =
+* Fixed empty icon boxes in swatch for Pro version 2.2.5+
+* Compatible with pre and post v2.2.x
+* Regeneration of CSS is now heavily suggested after plugin and theme upgrades
 
 = 0.1.5 =
 * Added fix for Pro version 2.2.0+ (FontAwesome 5 update)
@@ -75,6 +104,18 @@ None yet
 
 == Upgrade Notice ==
 
+= 0.2.1 =
+Improved CSS regen and support for domain or protocol changes
+
+= 0.1.9 =
+Fix 500 error on newest theme releases. Update this plugin prior to a theme update.
+
+= 0.1.8 =
+Bug fix for delete button
+
+= 0.1.6 =
+Fix empty box icons. Be sure to regenerate CSS after update.
+
 = 0.1.5 =
 Added l18n support and FA5 fix
 
@@ -83,3 +124,16 @@ ReadMe update only
 
 = 0.1.0 =
 You can't upgrade, but you can install.
+
+== Copyright ==
+
+Cornerstone Custom Icons is a plugin for WordPress that enables you to add custom icon fonts to the built in Elementor controls.
+Copyright (c) 2018 Michael Bourne.
+
+The Cornerstone Custom Icons Plugin is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>
+
+You can contact me at michael@michaelbourne.ca
